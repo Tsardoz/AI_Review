@@ -1,0 +1,13 @@
+Collecting pyyaml
+  Downloading pyyaml-6.0.3-cp311-cp311-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl.metadata (2.4 kB)
+Collecting python-dotenv
+  Downloading python_dotenv-1.2.1-py3-none-any.whl.metadata (25 kB)
+Downloading pyyaml-6.0.3-cp311-cp311-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl (806 kB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 806.6/806.6 kB 36.5 MB/s eta 0:00:00
+Downloading python_dotenv-1.2.1-py3-none-any.whl (21 kB)
+Installing collected packages: pyyaml, python-dotenv
+Successfully installed python-dotenv-1.2.1 pyyaml-6.0.3
+WARNING: Running pip as the 'root' user can result in broken permissions and conflicting behaviour with the system package manager. It is recommended to use a virtual environment instead: https://pip.pypa.io/warnings/venv
+
+[notice] A new release of pip is available: 24.0 -> 25.3
+[notice] To update, run: pip install --upgrade pip

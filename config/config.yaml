@@ -1,0 +1,95 @@
+# Main Configuration for Literature Review System
+
+project:
+  name: "AI-Powered Literature Review System"
+  topic: "Automated systematic literature review using large language models and multi-source APIs"
+  output_dir: "./data/output"
+  description: "A configurable, production-ready system for automated literature review demonstrating cost-aware LLM selection and multi-tier quality control"
+
+# PAPER 1: Methodology only (no domain-specific case study)
+# This describes the AI literature review framework itself
+
+research_domain:
+  name: "AI Literature Review Methodologies"
+  subject_type: "AI-Assisted Research Methods & Scholarly Communication"
+  
+  # Metadata keywords describing this research domain
+  # (These are NOT direct search queries—they help formulate specific queries)
+  keywords:
+    - "automated literature review"
+    - "large language models for literature synthesis"
+    - "systematic review automation"
+    - "LLM hallucination in research"
+    - "AI-assisted research automation"
+  
+  description: "Methodologies for automated, rigorous literature review using LLMs with quality control, cost optimization, and human oversight"
+  
+  # When searching, the system will formulate SPECIFIC queries from these keywords
+  # Example query formulation:
+  #   From "automated literature review" → 
+  #     "automated systematic literature review using AI"
+  #     "machine learning literature synthesis workflow"
+  #     "LLM-based paper screening and summarization"
+  #   From "LLM hallucination in research" →
+  #     "preventing hallucination in AI-generated literature reviews"
+  #     "fact-checking automated research summaries"
+  #     "citation validation in LLM outputs"
+  # Each resulting query is narrow and specific
+  
+  target_journals:
+    - "PLOS ONE"
+    - "Patterns (Cell Press)"
+    - "Scientific Data (Nature)"
+    - "Nature Machine Intelligence"
+
+# PAPER 2 (Future): Will be configured separately for irrigation scheduling
+# At that time, change research_domain to:
+# name: "Irrigation Scheduling in Orchards"
+# subject_type: "Precision Agriculture & AI"
+# keywords: ["irrigation scheduling AI", "precision agriculture water management", "smart orchard systems", "automated irrigation control"]
+# target_journals: [Computers and Electronics in Agriculture, Agricultural Systems, Precision Agriculture]
+  
+search:
+  year_min: 2015
+  year_max: 2025
+  max_papers_per_source: 50
+  max_total_papers: 150
+  sources:
+    - semantic_scholar
+    - crossref
+    - arxiv
+    
+quality_filters:
+  peer_reviewed: true
+  min_citations: 5
+  relevance_threshold: 0.7
+  languages: ["en"]
+  exclude_predatory: true
+  
+acquisition:
+  pdf_timeout: 30
+  max_retries: 3
+  fallback_to_abstract: true
+  
+llm_assignments:
+  query_formulation: "fast"      # Use faster model for query generation
+  relevance_scoring: "fast"      # Use faster model for initial filtering
+  summarization: "quality"       # Use premium model for summaries
+  citation_validation: "fast"    # Use faster model for citation checks
+  synthesis: "quality"           # Use premium model for final synthesis
+  
+citation:
+  style: "author-date"  # Per Artificial Intelligence in Agriculture journal
+  format: "bibtex"
+  validate_dois: true
+  
+output:
+  formats: ["csv", "docx", "bibtex"]
+  include_quality_report: true
+  include_raw_data: true
+  
+logging:
+  level: "INFO"
+  file: "./data/system.log"
+  max_size: "10MB"
+  backup_count: 3

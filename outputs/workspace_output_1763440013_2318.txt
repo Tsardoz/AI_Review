@@ -1,0 +1,4 @@
+  File "/workspace/tests/test_connectivity.py", line 367
+    print(f"  - {test}: {traceback.split('AssertionError: ')[-1].split('\\n')[0]}")
+                                                                                  ^
+SyntaxError: f-string expression part cannot include a backslash

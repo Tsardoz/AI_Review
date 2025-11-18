@@ -1,0 +1,176 @@
+2025-11-18 04:27:17,119 - llm_manager - ERROR - Failed to initialize provider openai: OpenAI library not installed
+2025-11-18 04:27:17,120 - llm_manager - ERROR - Failed to initialize provider anthropic: Anthropic library not installed
+2025-11-18 04:27:17,120 - llm_manager - ERROR - Failed to initialize provider google: Google AI library not installed
+2025-11-18 04:27:17,120 - llm_manager - ERROR - Failed to initialize provider local: OpenAI library required for local provider compatibility
+2025-11-18 04:27:17,120 - llm_manager - ERROR - Failed to initialize provider custom: OpenAI library not installed
+🚀 Running Literature Review System Connectivity Tests
+
+test_config_loading (__main__.TestConfiguration.test_config_loading)
+Test that configuration files load correctly. ... ok
+test_config_validation (__main__.TestConfiguration.test_config_validation)
+Test configuration validation. ... ok
+test_llm_assignments (__main__.TestConfiguration.test_llm_assignments)
+Test LLM task assignments. ... ok
+test_llm_providers (__main__.TestConfiguration.test_llm_providers)
+Test LLM provider configuration. ... ok
+test_project_config (__main__.TestConfiguration.test_project_config)
+Test project-specific configuration. ... ok
+test_search_config (__main__.TestConfiguration.test_search_config)
+Test search configuration. ... ok
+test_log_levels (__main__.TestLogging.test_log_levels)
+Test different log levels. ... 2025-11-18 04:27:17,125 - test - INFO - Info message
+2025-11-18 04:27:17,125 - test - WARNING - Warning message
+2025-11-18 04:27:17,125 - test - ERROR - Error message
+2025-11-18 04:27:17,125 - test - CRITICAL - Critical message
+ok
+test_logger_creation (__main__.TestLogging.test_logger_creation)
+Test logger creation. ... 2025-11-18 04:27:17,125 - test - INFO - Test log message
+ok
+test_structured_logging (__main__.TestLogging.test_structured_logging)
+Test structured logging with extra fields. ... 2025-11-18 04:27:17,125 - test - INFO - LLM test call
+2025-11-18 04:27:17,125 - test - INFO - Search executed: test_source
+2025-11-18 04:27:17,125 - test - INFO - Paper processed: processed
+ok
+test_task_logger (__main__.TestLogging.test_task_logger)
+Test task-specific logging. ... ERROR
+test_llm_manager_creation (__main__.TestLLMInterface.test_llm_manager_creation)
+Test LLM manager initialization. ... ok
+test_message_creation (__main__.TestLLMInterface.test_message_creation)
+Test LLM message creation. ... ok
+test_provider_availability (__main__.TestLLMInterface.test_provider_availability)
+Test that LLM providers are available. ... FAIL
+test_provider_test (__main__.TestLLMInterface.test_provider_test)
+Test provider connectivity (requires API keys). ... skipped 'Requires actual API keys'
+test_simple_generation (__main__.TestLLMInterface.test_simple_generation)
+Test simple text generation (requires API keys). ... skipped 'Requires actual API keys'
+test_agent_creation (__main__.TestBaseAgent.test_agent_creation)
+Test agent creation. ... ok
+test_execution (__main__.TestBaseAgent.test_execution)
+Test agent execution. ... ERROR
+test_progress_tracking (__main__.TestBaseAgent.test_progress_tracking)
+Test progress tracking. ... ok
+test_status_management (__main__.TestBaseAgent.test_status_management)
+Test status management. ... ok
+test_status_summary (__main__.TestBaseAgent.test_status_summary)
+Test status summary generation. ... ok
+test_task_creation (__main__.TestBaseAgent.test_task_creation)
+Test task creation. ... ERROR
+test_sequential_creation (__main__.TestSequentialAgent.test_sequential_creation)
+Test sequential agent creation. ... ok
+test_sequential_execution (__main__.TestSequentialAgent.test_sequential_execution)
+Test sequential task execution. ... 2025-11-18 04:27:17,128 - agent.test_sequential - INFO - Starting sequential execution of 2 tasks
+ERROR
+test_task_addition (__main__.TestSequentialAgent.test_task_addition)
+Test adding tasks to sequence. ... ok
+
+======================================================================
+ERROR: test_task_logger (__main__.TestLogging.test_task_logger)
+Test task-specific logging.
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/tests/test_connectivity.py", line 107, in test_task_logger
+    task_logger.info("Task-specific log message")
+  File "/workspace/src/utils/logger.py", line 226, in info
+    self._log_with_task_context('info', message, **kwargs)
+  File "/workspace/src/utils/logger.py", line 220, in _log_with_task_context
+    getattr(self.logger, level)(f"[{self.task_name}] {message}", **kwargs)
+  File "/usr/local/lib/python3.11/logging/__init__.py", line 1489, in info
+    self._log(INFO, msg, args, **kwargs)
+TypeError: Logger._log() got an unexpected keyword argument 'task_id'
+
+======================================================================
+ERROR: test_execution (__main__.TestBaseAgent.test_execution)
+Test agent execution.
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/tests/test_connectivity.py", line 267, in test_execution
+    result = self.agent.run()
+             ^^^^^^^^^^^^^^^^
+  File "/workspace/tests/test_connectivity.py", line 228, in run
+    return self.execute_with_error_handling(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/src/core/base_agent.py", line 160, in execute_with_error_handling
+    task_id = self.create_task(task_name)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/src/core/base_agent.py", line 89, in create_task
+    self.task_logger.info(f"Started task: {task_name}")
+  File "/workspace/src/utils/logger.py", line 226, in info
+    self._log_with_task_context('info', message, **kwargs)
+  File "/workspace/src/utils/logger.py", line 220, in _log_with_task_context
+    getattr(self.logger, level)(f"[{self.task_name}] {message}", **kwargs)
+  File "/usr/local/lib/python3.11/logging/__init__.py", line 1489, in info
+    self._log(INFO, msg, args, **kwargs)
+TypeError: Logger._log() got an unexpected keyword argument 'task_id'
+
+======================================================================
+ERROR: test_task_creation (__main__.TestBaseAgent.test_task_creation)
+Test task creation.
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/tests/test_connectivity.py", line 244, in test_task_creation
+    task_id = self.agent.create_task("test_task")
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/src/core/base_agent.py", line 89, in create_task
+    self.task_logger.info(f"Started task: {task_name}")
+  File "/workspace/src/utils/logger.py", line 226, in info
+    self._log_with_task_context('info', message, **kwargs)
+  File "/workspace/src/utils/logger.py", line 220, in _log_with_task_context
+    getattr(self.logger, level)(f"[{self.task_name}] {message}", **kwargs)
+  File "/usr/local/lib/python3.11/logging/__init__.py", line 1489, in info
+    self._log(INFO, msg, args, **kwargs)
+TypeError: Logger._log() got an unexpected keyword argument 'task_id'
+
+======================================================================
+ERROR: test_sequential_execution (__main__.TestSequentialAgent.test_sequential_execution)
+Test sequential task execution.
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/tests/test_connectivity.py", line 318, in test_sequential_execution
+    result = self.agent.run()
+             ^^^^^^^^^^^^^^^^
+  File "/workspace/src/core/base_agent.py", line 340, in run
+    result = self.execute_with_error_handling(
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/src/core/base_agent.py", line 160, in execute_with_error_handling
+    task_id = self.create_task(task_name)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/src/core/base_agent.py", line 89, in create_task
+    self.task_logger.info(f"Started task: {task_name}")
+  File "/workspace/src/utils/logger.py", line 226, in info
+    self._log_with_task_context('info', message, **kwargs)
+  File "/workspace/src/utils/logger.py", line 220, in _log_with_task_context
+    getattr(self.logger, level)(f"[{self.task_name}] {message}", **kwargs)
+  File "/usr/local/lib/python3.11/logging/__init__.py", line 1489, in info
+    self._log(INFO, msg, args, **kwargs)
+TypeError: Logger._log() got an unexpected keyword argument 'task_id'
+
+======================================================================
+FAIL: test_provider_availability (__main__.TestLLMInterface.test_provider_availability)
+Test that LLM providers are available.
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/tests/test_connectivity.py", line 159, in test_provider_availability
+    self.assertGreater(len(available_providers), 0)
+AssertionError: 0 not greater than 0
+
+----------------------------------------------------------------------
+Ran 24 tests in 0.004s
+
+FAILED (failures=1, errors=4, skipped=2)
+
+============================================================
+TEST SUMMARY
+============================================================
+Tests run: 24
+Failures: 1
+Errors: 4
+Success rate: 79.2%
+
+FAILURES:
+  - test_provider_availability (__main__.TestLLMInterface.test_provider_availability): 0 not greater than 0
+
+ERRORS:
+  - test_task_logger (__main__.TestLogging.test_task_logger): TypeError: Logger._log() got an unexpected keyword argument 'task_id'
+  - test_execution (__main__.TestBaseAgent.test_execution): TypeError: Logger._log() got an unexpected keyword argument 'task_id'
+  - test_task_creation (__main__.TestBaseAgent.test_task_creation): TypeError: Logger._log() got an unexpected keyword argument 'task_id'
+  - test_sequential_execution (__main__.TestSequentialAgent.test_sequential_execution): TypeError: Logger._log() got an unexpected keyword argument 'task_id'

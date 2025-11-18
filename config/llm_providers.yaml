@@ -1,0 +1,90 @@
+# LLM Provider Configuration
+# Configure your preferred providers and assign models to performance tiers
+
+providers:
+  openai:
+    api_key: "${OPENAI_API_KEY}"  # Set environment variable
+    base_url: "https://api.openai.com/v1"
+    models:
+      fast: "gpt-3.5-turbo"
+      quality: "gpt-4-turbo-preview"
+      max_tokens: 4096
+    pricing:
+      fast: 0.0005  # per 1K tokens
+      quality: 0.01  # per 1K tokens
+      
+  anthropic:
+    api_key: "${ANTHROPIC_API_KEY}"
+    base_url: "https://api.anthropic.com"
+    models:
+      fast: "claude-3-haiku-20240307"
+      quality: "claude-3-sonnet-20240229"
+      max_tokens: 4096
+    pricing:
+      fast: 0.00025  # per 1K tokens
+      quality: 0.015  # per 1K tokens
+      
+  google:
+    api_key: "${GOOGLE_API_KEY}"
+    base_url: "https://generativelanguage.googleapis.com/v1beta"
+    models:
+      fast: "gemini-1.5-flash"
+      quality: "gemini-1.5-pro"
+      max_tokens: 8192
+    pricing:
+      fast: 0.000075  # per 1K tokens
+      quality: 0.0035  # per 1K tokens
+      
+  local:
+    base_url: "http://localhost:11434/v1"  # Ollama endpoint
+    api_key: "not-required"  # Local models don't need API keys
+    models:
+      fast: "llama3:8b"
+      quality: "llama3:70b"
+      max_tokens: 4096
+    pricing:
+      fast: 0.0  # Free after setup
+      quality: 0.0  # Free after setup
+      
+  custom:
+    base_url: "${CUSTOM_LLM_URL}"  # Any OpenAI-compatible endpoint
+    api_key: "${CUSTOM_LLM_API_KEY}"
+    models:
+      fast: "custom-fast-model"
+      quality: "custom-quality-model"
+      max_tokens: 4096
+    pricing:
+      fast: 0.001  # Customize based on your provider
+      quality: 0.01
+
+# Default provider selection
+default_provider: "anthropic"  # Fallback if no specific provider configured
+
+# Performance tier assignments (you can customize these)
+tier_assignments:
+  fast:
+    description: "Fast, cost-effective models for simple tasks"
+    recommended_for: ["query_formulation", "relevance_scoring", "citation_validation"]
+  quality:
+    description: "High-quality models for complex analysis"
+    recommended_for: ["summarization", "synthesis", "detailed_analysis"]
+
+# Rate limiting and retry configuration
+rate_limits:
+  openai:
+    requests_per_minute: 60
+    tokens_per_minute: 90000
+  anthropic:
+    requests_per_minute: 50
+    tokens_per_minute: 100000
+  google:
+    requests_per_minute: 15
+    tokens_per_minute: 32000
+  local:
+    requests_per_minute: 1000  # No real limit for local
+    tokens_per_minute: 1000000
+
+retry_config:
+  max_retries: 3
+  backoff_factor: 2
+  max_delay: 60  # seconds

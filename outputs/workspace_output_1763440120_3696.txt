@@ -1,0 +1,91 @@
+2025-11-18 04:28:41,570 - llm_manager - ERROR - Failed to initialize provider openai: OpenAI library not installed
+2025-11-18 04:28:41,570 - llm_manager - ERROR - Failed to initialize provider anthropic: Anthropic library not installed
+2025-11-18 04:28:41,570 - llm_manager - ERROR - Failed to initialize provider google: Google AI library not installed
+2025-11-18 04:28:41,570 - llm_manager - ERROR - Failed to initialize provider local: OpenAI library required for local provider compatibility
+2025-11-18 04:28:41,570 - llm_manager - ERROR - Failed to initialize provider custom: OpenAI library not installed
+🚀 Running Literature Review System Connectivity Tests
+
+test_config_loading (__main__.TestConfiguration.test_config_loading)
+Test that configuration files load correctly. ... ok
+test_config_validation (__main__.TestConfiguration.test_config_validation)
+Test configuration validation. ... ok
+test_llm_assignments (__main__.TestConfiguration.test_llm_assignments)
+Test LLM task assignments. ... ok
+test_llm_providers (__main__.TestConfiguration.test_llm_providers)
+Test LLM provider configuration. ... ok
+test_project_config (__main__.TestConfiguration.test_project_config)
+Test project-specific configuration. ... ok
+test_search_config (__main__.TestConfiguration.test_search_config)
+Test search configuration. ... ok
+test_log_levels (__main__.TestLogging.test_log_levels)
+Test different log levels. ... 2025-11-18 04:28:41,574 - test - INFO - Info message
+2025-11-18 04:28:41,574 - test - WARNING - Warning message
+2025-11-18 04:28:41,574 - test - ERROR - Error message
+2025-11-18 04:28:41,574 - test - CRITICAL - Critical message
+ok
+test_logger_creation (__main__.TestLogging.test_logger_creation)
+Test logger creation. ... 2025-11-18 04:28:41,574 - test - INFO - Test log message
+ok
+test_structured_logging (__main__.TestLogging.test_structured_logging)
+Test structured logging with extra fields. ... 2025-11-18 04:28:41,574 - test - INFO - LLM test call
+2025-11-18 04:28:41,574 - test - INFO - Search executed: test_source
+2025-11-18 04:28:41,574 - test - INFO - Paper processed: processed
+ok
+test_task_logger (__main__.TestLogging.test_task_logger)
+Test task-specific logging. ... 2025-11-18 04:28:41,574 - test - INFO - [Test Task] Task-specific log message
+ok
+test_llm_manager_creation (__main__.TestLLMInterface.test_llm_manager_creation)
+Test LLM manager initialization. ... ok
+test_message_creation (__main__.TestLLMInterface.test_message_creation)
+Test LLM message creation. ... ok
+test_provider_availability (__main__.TestLLMInterface.test_provider_availability)
+Test that LLM providers are available. ... skipped 'No LLM providers configured (libraries not installed)'
+test_provider_test (__main__.TestLLMInterface.test_provider_test)
+Test provider connectivity (requires API keys). ... skipped 'Requires actual API keys'
+test_simple_generation (__main__.TestLLMInterface.test_simple_generation)
+Test simple text generation (requires API keys). ... skipped 'Requires actual API keys'
+test_agent_creation (__main__.TestBaseAgent.test_agent_creation)
+Test agent creation. ... ok
+test_execution (__main__.TestBaseAgent.test_execution)
+Test agent execution. ... 2025-11-18 04:28:41,575 - agent.test_agent - INFO - [test_task] Started task: test_task
+2025-11-18 04:28:41,575 - agent.test_agent - INFO - Starting test_task
+2025-11-18 04:28:41,575 - agent.test_agent - INFO - [test_task] Task completed: Success
+2025-11-18 04:28:41,575 - agent.test_agent - INFO - Completed test_task in 0.00s
+ok
+test_progress_tracking (__main__.TestBaseAgent.test_progress_tracking)
+Test progress tracking. ... ok
+test_status_management (__main__.TestBaseAgent.test_status_management)
+Test status management. ... ok
+test_status_summary (__main__.TestBaseAgent.test_status_summary)
+Test status summary generation. ... ok
+test_task_creation (__main__.TestBaseAgent.test_task_creation)
+Test task creation. ... 2025-11-18 04:28:41,576 - agent.test_agent - INFO - [test_task] Started task: test_task
+ok
+test_sequential_creation (__main__.TestSequentialAgent.test_sequential_creation)
+Test sequential agent creation. ... ok
+test_sequential_execution (__main__.TestSequentialAgent.test_sequential_execution)
+Test sequential task execution. ... 2025-11-18 04:28:41,576 - agent.test_sequential - INFO - Starting sequential execution of 2 tasks
+2025-11-18 04:28:41,576 - agent.test_sequential - INFO - [task1] Started task: task1
+2025-11-18 04:28:41,576 - agent.test_sequential - INFO - Starting task1
+2025-11-18 04:28:41,576 - agent.test_sequential - INFO - [task1] Task completed: Success
+2025-11-18 04:28:41,576 - agent.test_sequential - INFO - Completed task1 in 0.00s
+2025-11-18 04:28:41,576 - agent.test_sequential - INFO - [task2] Started task: task2
+2025-11-18 04:28:41,576 - agent.test_sequential - INFO - Starting task2
+2025-11-18 04:28:41,576 - agent.test_sequential - INFO - [task2] Task completed: Success
+2025-11-18 04:28:41,576 - agent.test_sequential - INFO - Completed task2 in 0.00s
+ok
+test_task_addition (__main__.TestSequentialAgent.test_task_addition)
+Test adding tasks to sequence. ... ok
+
+----------------------------------------------------------------------
+Ran 24 tests in 0.003s
+
+OK (skipped=3)
+
+============================================================
+TEST SUMMARY
+============================================================
+Tests run: 24
+Failures: 0
+Errors: 0
+Success rate: 100.0%
