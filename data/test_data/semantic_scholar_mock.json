@@ -1,0 +1,99 @@
+{
+  "mock_search_response": {
+    "total": 42,
+    "offset": 0,
+    "data": [
+      {
+        "paperId": "mock123abc",
+        "title": "Automated Literature Review Using Large Language Models: A Systematic Approach",
+        "abstract": "We present a novel framework for automated literature review that leverages large language models to search, filter, and synthesize academic papers. Our approach includes multi-tier quality control and cost-aware model selection.",
+        "authors": [
+          {"authorId": "123", "name": "Jane Smith"},
+          {"authorId": "456", "name": "John Doe"}
+        ],
+        "year": 2023,
+        "citationCount": 15,
+        "referenceCount": 45,
+        "venue": "PLOS ONE",
+        "publicationTypes": ["JournalArticle"],
+        "publicationDate": "2023-06-15",
+        "journal": {"name": "PLOS ONE"},
+        "externalIds": {
+          "DOI": "10.1371/journal.pone.mock123",
+          "ArXiv": null
+        },
+        "url": "https://www.semanticscholar.org/paper/mock123abc",
+        "openAccessPdf": {
+          "url": "https://example.com/papers/mock123.pdf"
+        }
+      },
+      {
+        "paperId": "mock456def",
+        "title": "Cost-Aware LLM Selection for Research Automation: Balancing Quality and Budget",
+        "abstract": "This study examines trade-offs between different large language model providers for automated research tasks, with focus on cost optimization while maintaining output quality.",
+        "authors": [
+          {"authorId": "789", "name": "Alice Johnson"}
+        ],
+        "year": 2024,
+        "citationCount": 8,
+        "referenceCount": 32,
+        "venue": "Patterns",
+        "publicationTypes": ["JournalArticle"],
+        "publicationDate": "2024-02-10",
+        "journal": {"name": "Patterns"},
+        "externalIds": {
+          "DOI": "10.1016/j.patter.mock456"
+        },
+        "url": "https://www.semanticscholar.org/paper/mock456def",
+        "openAccessPdf": null
+      },
+      {
+        "paperId": "mock789ghi",
+        "title": "Hallucination Detection in AI-Generated Scientific Summaries",
+        "abstract": "We propose methods for detecting and preventing hallucinations in AI-generated academic literature summaries, including citation validation and fact-checking techniques.",
+        "authors": [
+          {"authorId": "101", "name": "Bob Chen"},
+          {"authorId": "102", "name": "Carol White"}
+        ],
+        "year": 2023,
+        "citationCount": 22,
+        "referenceCount": 58,
+        "venue": "Nature Machine Intelligence",
+        "publicationTypes": ["JournalArticle"],
+        "publicationDate": "2023-09-01",
+        "journal": {"name": "Nature Machine Intelligence"},
+        "externalIds": {
+          "DOI": "10.1038/s42256-mock789"
+        },
+        "url": "https://www.semanticscholar.org/paper/mock789ghi",
+        "openAccessPdf": {
+          "url": "https://example.com/papers/mock789.pdf"
+        }
+      }
+    ]
+  },
+  "mock_paper_details": {
+    "paperId": "mock123abc",
+    "title": "Automated Literature Review Using Large Language Models: A Systematic Approach",
+    "abstract": "We present a novel framework for automated literature review that leverages large language models to search, filter, and synthesize academic papers. Our approach includes multi-tier quality control and cost-aware model selection.",
+    "authors": [
+      {"authorId": "123", "name": "Jane Smith"},
+      {"authorId": "456", "name": "John Doe"}
+    ],
+    "year": 2023,
+    "citationCount": 15,
+    "referenceCount": 45,
+    "venue": "PLOS ONE",
+    "publicationTypes": ["JournalArticle"],
+    "publicationDate": "2023-06-15",
+    "journal": {"name": "PLOS ONE"},
+    "externalIds": {
+      "DOI": "10.1371/journal.pone.mock123",
+      "ArXiv": null
+    },
+    "url": "https://www.semanticscholar.org/paper/mock123abc",
+    "openAccessPdf": {
+      "url": "https://example.com/papers/mock123.pdf"
+    }
+  }
+}

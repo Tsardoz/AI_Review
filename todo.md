@@ -14,12 +14,12 @@
 - [x] Add simple caching table for API responses
 - [x] Write unit tests for models and DB
 
-## Stage 2: Single Source Search
-- [ ] Implement Semantic Scholar API integration (use fixtures/mocks first)
-- [ ] Create query formulation system
-- [ ] Store results in DB (normalized schema)
-- [ ] Add test data and mock responses
-- [ ] Create search testing script
+## Stage 2: Single Source Search ✅ COMPLETED
+- [x] Implement Semantic Scholar API integration (use fixtures/mocks first)
+- [x] Create query formulation system
+- [x] Store results in DB (normalized schema)
+- [x] Add test data and mock responses
+- [x] Create search testing script
 
 ## Stage 2.5: Minimal E2E Workflow (Search → Filter → Acquire → Summarize)
 - [ ] Run 1–5 papers end-to-end with Semantic Scholar only

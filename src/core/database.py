@@ -9,7 +9,7 @@ import sqlite3
 import json
 from pathlib import Path
 from typing import Optional, List, Dict, Any
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, UTC
 from contextlib import contextmanager
 
 from .models import (
@@ -443,7 +443,7 @@ class DatabaseManager:
                     return None
                 
                 expires_at = datetime.fromisoformat(row['expires_at'])
-                if expires_at < datetime.utcnow():
+                if expires_at < datetime.now(UTC):
                     # Cache expired
                     cursor.execute("DELETE FROM cache WHERE cache_key = ?", (cache_key,))
                     return None
@@ -462,7 +462,7 @@ class DatabaseManager:
     def cache_search_result(self, cache_key: str, source: PaperSource, data: Dict[str, Any], ttl_hours: int = 24):
         """Cache search result for later retrieval."""
         try:
-            expires_at = datetime.utcnow() + timedelta(hours=ttl_hours)
+            expires_at = datetime.now(UTC) + timedelta(hours=ttl_hours)
             
             with self.get_connection() as conn:
                 cursor = conn.cursor()
@@ -471,7 +471,7 @@ class DatabaseManager:
                     VALUES (?, ?, ?, ?, ?)
                 """, (
                     cache_key, source.value, json.dumps(data),
-                    datetime.utcnow().isoformat(), expires_at.isoformat()
+                    datetime.now(UTC).isoformat(), expires_at.isoformat()
                 ))
                 self.logger.debug(f"Cached result: {cache_key}")
         except Exception as e:
@@ -482,7 +482,7 @@ class DatabaseManager:
         try:
             with self.get_connection() as conn:
                 cursor = conn.cursor()
-                cursor.execute("DELETE FROM cache WHERE expires_at < ?", (datetime.utcnow().isoformat(),))
+                cursor.execute("DELETE FROM cache WHERE expires_at < ?", (datetime.now(UTC).isoformat(),))
                 deleted = cursor.rowcount
                 self.logger.info(f"Cleaned up {deleted} expired cache entries")
         except Exception as e:
@@ -505,7 +505,7 @@ class DatabaseManager:
                     checkpoint.papers_total, checkpoint.started_at.isoformat(),
                     checkpoint.completed_at.isoformat() if checkpoint.completed_at else None,
                     checkpoint.error_message, json.dumps(checkpoint.metadata),
-                    datetime.utcnow().isoformat()
+                    datetime.now(UTC).isoformat()
                 ))
                 return True
         except Exception as e:

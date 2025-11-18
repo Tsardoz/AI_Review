@@ -5,22 +5,21 @@ Defines Pydantic models for Papers, SearchResults, Summaries, and Citations
 with built-in validation and serialization.
 """
 
-from pydantic import BaseModel, Field, validator
+from pydantic import BaseModel, Field, field_validator, ConfigDict
 from typing import Optional, List, Dict, Any
-from datetime import datetime
+from datetime import datetime, UTC
 from enum import Enum
 
 
 class ResearchDomain(BaseModel):
     """Configuration for the research domain/subject area."""
+    model_config = ConfigDict(use_enum_values=False)
+    
     name: str = Field(..., description="Name of the research domain (e.g., 'Irrigation Scheduling')")
     subject_type: str = Field(..., description="Academic field (e.g., 'Agricultural Technology', 'Computer Science')")
     keywords: List[str] = Field(default_factory=list, description="Domain-specific keywords")
     description: str = Field("", description="Brief description of the research focus")
     target_journals: List[str] = Field(default_factory=list, description="Target journals/venues")
-
-    class Config:
-        use_enum_values = False
 
 
 class PaperSource(str, Enum):
@@ -46,6 +45,8 @@ class PaperStatus(str, Enum):
 
 class Paper(BaseModel):
     """Core paper entity."""
+    model_config = ConfigDict(use_enum_values=False)
+    
     id: str = Field(..., description="Unique identifier (DOI or generated)")
     title: str = Field(..., min_length=5, description="Paper title")
     authors: List[str] = Field(default_factory=list, description="Author names")
@@ -68,8 +69,8 @@ class Paper(BaseModel):
     
     # Processing
     status: PaperStatus = Field(default=PaperStatus.DISCOVERED)
-    discovered_at: datetime = Field(default_factory=datetime.utcnow)
-    last_updated: datetime = Field(default_factory=datetime.utcnow)
+    discovered_at: datetime = Field(default_factory=lambda: datetime.now(UTC))
+    last_updated: datetime = Field(default_factory=lambda: datetime.now(UTC))
     
     # Quality metrics
     citation_count: int = Field(default=0, ge=0)
@@ -81,17 +82,16 @@ class Paper(BaseModel):
     full_text: Optional[str] = Field(None, description="Extracted full text from PDF")
     metadata: Dict[str, Any] = Field(default_factory=dict, description="Additional metadata")
     
-    class Config:
-        use_enum_values = False
-    
-    @validator('doi')
+    @field_validator('doi')
+    @classmethod
     def validate_doi(cls, v):
         """Validate DOI format."""
         if v and not v.startswith('10.'):
             raise ValueError('DOI must start with "10."')
         return v
     
-    @validator('url', 'pdf_url')
+    @field_validator('url', 'pdf_url')
+    @classmethod
     def validate_urls(cls, v):
         """Validate URL format."""
         if v and not (v.startswith('http://') or v.startswith('https://')):
@@ -101,6 +101,8 @@ class Paper(BaseModel):
 
 class SearchResult(BaseModel):
     """Result from a search query."""
+    model_config = ConfigDict(use_enum_values=False)
+    
     query: str = Field(..., description="Search query executed")
     source: PaperSource = Field(..., description="Source API")
     papers: List[Paper] = Field(default_factory=list)
@@ -108,20 +110,19 @@ class SearchResult(BaseModel):
     page: int = Field(1, ge=1)
     page_size: int = Field(50, ge=1, le=200)
     
-    executed_at: datetime = Field(default_factory=datetime.utcnow)
+    executed_at: datetime = Field(default_factory=lambda: datetime.now(UTC))
     execution_time_seconds: float = Field(0.0, ge=0.0)
     success: bool = Field(True)
     error_message: Optional[str] = Field(None)
     
     # Caching info
     cached: bool = Field(False, description="Whether result was served from cache")
-    
-    class Config:
-        use_enum_values = False
 
 
 class Summary(BaseModel):
     """LLM-generated summary of a paper."""
+    model_config = ConfigDict(use_enum_values=False)
+    
     paper_id: str = Field(..., description="Reference to Paper.id")
     
     # Summary content
@@ -133,7 +134,7 @@ class Summary(BaseModel):
     future_work: Optional[str] = Field(None, description="Suggested future directions")
     
     # Quality metrics
-    generated_at: datetime = Field(default_factory=datetime.utcnow)
+    generated_at: datetime = Field(default_factory=lambda: datetime.now(UTC))
     llm_provider: str = Field(..., description="Which LLM generated this")
     llm_model: str = Field(..., description="Specific model used")
     tokens_used: int = Field(0, ge=0)
@@ -147,13 +148,12 @@ class Summary(BaseModel):
     manually_reviewed: bool = Field(False)
     reviewer_notes: Optional[str] = Field(None)
     metadata: Dict[str, Any] = Field(default_factory=dict)
-    
-    class Config:
-        use_enum_values = False
 
 
 class Citation(BaseModel):
     """Formatted citation for a paper."""
+    model_config = ConfigDict(use_enum_values=False)
+    
     paper_id: str = Field(..., description="Reference to Paper.id")
     
     # Citation formats
@@ -168,11 +168,8 @@ class Citation(BaseModel):
     url_validated: bool = Field(False, description="URL accessible")
     validation_errors: List[str] = Field(default_factory=list)
     
-    generated_at: datetime = Field(default_factory=datetime.utcnow)
+    generated_at: datetime = Field(default_factory=lambda: datetime.now(UTC))
     metadata: Dict[str, Any] = Field(default_factory=dict)
-    
-    class Config:
-        use_enum_values = False
 
 
 class ProcessingCheckpoint(BaseModel):
@@ -182,7 +179,7 @@ class ProcessingCheckpoint(BaseModel):
     papers_processed: int = Field(0, ge=0)
     papers_total: int = Field(0, ge=0)
     
-    started_at: datetime = Field(default_factory=datetime.utcnow)
+    started_at: datetime = Field(default_factory=lambda: datetime.now(UTC))
     completed_at: Optional[datetime] = Field(None)
     
     error_message: Optional[str] = Field(None)
@@ -195,6 +192,6 @@ class CacheEntry(BaseModel):
     source: PaperSource = Field(...)
     data: Dict[str, Any] = Field(..., description="Cached response data")
     
-    created_at: datetime = Field(default_factory=datetime.utcnow)
+    created_at: datetime = Field(default_factory=lambda: datetime.now(UTC))
     expires_at: datetime = Field(..., description="Cache expiration time")
     hits: int = Field(0, ge=0, description="Number of times cache was hit")
