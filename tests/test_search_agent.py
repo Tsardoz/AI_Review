@@ -10,15 +10,10 @@ Tests:
 """
 
 import os
-import sys
 import pytest
 import json
 from unittest.mock import Mock, patch, MagicMock
 from pathlib import Path
-
-# Add src to path
-sys.path.insert(0, str(Path(__file__).parent.parent / 'src'))
-
 from src.core.models import ResearchDomain, Paper, SearchResult, PaperSource
 from src.core.database import DatabaseManager
 from src.agents.research_agent import QueryFormulator, ResearchAgent
@@ -246,6 +241,68 @@ class TestResearchAgentIntegration:
         
         assert stats['total_papers_found'] == 0
         assert stats['queries_executed'] == 1
+    
+    @patch('src.integrations.semantic_scholar.SemanticScholarAPI.search')
+    def test_search_pagination_logic(self, mock_search, temp_db):
+        """Test that the search API correctly returns multiple papers in a single call.
+        
+        Note: Current implementation requests all papers in one API call (limit=papers_per_query).
+        The Semantic Scholar API handles pagination internally and returns up to 'limit' papers.
+        This test verifies the agent correctly processes a batch of papers.
+        """
+        # Create mock papers
+        paper1 = Paper(
+            id="p1",
+            title="Paper 1",
+            doi="10.1/1",
+            year=2023,
+            sources=[PaperSource.SEMANTIC_SCHOLAR]
+        )
+        
+        paper2 = Paper(
+            id="p2",
+            title="Paper 2",
+            doi="10.1/2",
+            year=2023,
+            sources=[PaperSource.SEMANTIC_SCHOLAR]
+        )
+        
+        # Create a single result with multiple papers
+        result = SearchResult(
+            query="test",
+            source=PaperSource.SEMANTIC_SCHOLAR,
+            papers=[paper1, paper2],
+            total_results=2,
+            page=1,
+            page_size=2,
+            success=True
+        )
+        
+        # Configure the mock to return both papers in one call
+        mock_search.return_value = result
+        
+        agent = ResearchAgent(temp_db)
+        domain = ResearchDomain(
+            name="Test",
+            subject_type="AI",
+            keywords=["test"],
+            description="Test batch retrieval"
+        )
+        
+        # Request 2 papers
+        stats = agent.search_literature(domain, max_queries=1, papers_per_query=2)
+        
+        # Assertions: Verify batch processing works correctly
+        assert mock_search.call_count == 1, "Agent should make 1 API call with limit=2"
+        assert stats['total_papers_found'] == 2, "Should have found both papers"
+        assert stats['papers_stored'] == 2, "Should have stored both papers"
+        
+        # Verify the API was called with correct limit
+        call_args = mock_search.call_args
+        assert call_args.kwargs['limit'] == 2, "Should request 2 papers in one call"
+        # Verify both papers were stored
+        stored_papers = temp_db.get_all_papers()
+        assert len(stored_papers) >= 2, "Both papers should be stored in database"
 
 
 class TestCacheKeyGeneration:

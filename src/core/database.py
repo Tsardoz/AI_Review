@@ -152,10 +152,19 @@ class DatabaseManager:
                 )
             """)
             
+            # Migration: Add exclusion tracking fields if they don't exist
+            try:
+                cursor.execute("SELECT exclusion_reason FROM papers LIMIT 1")
+            except sqlite3.OperationalError:
+                self.logger.info("Adding exclusion tracking fields to papers table")
+                cursor.execute("ALTER TABLE papers ADD COLUMN exclusion_reason TEXT")
+                cursor.execute("ALTER TABLE papers ADD COLUMN exclusion_notes TEXT")
+            
             # Create indices for performance
             cursor.execute("CREATE INDEX IF NOT EXISTS idx_papers_doi ON papers(doi)")
             cursor.execute("CREATE INDEX IF NOT EXISTS idx_papers_status ON papers(status)")
             cursor.execute("CREATE INDEX IF NOT EXISTS idx_papers_year ON papers(year)")
+            cursor.execute("CREATE INDEX IF NOT EXISTS idx_papers_exclusion ON papers(exclusion_reason)")
             cursor.execute("CREATE INDEX IF NOT EXISTS idx_summaries_paper_id ON summaries(paper_id)")
             cursor.execute("CREATE INDEX IF NOT EXISTS idx_citations_paper_id ON citations(paper_id)")
             cursor.execute("CREATE INDEX IF NOT EXISTS idx_cache_expires ON cache(expires_at)")
@@ -188,7 +197,8 @@ class DatabaseManager:
                             year = ?, journal = ?, conference = ?, volume = ?, issue = ?, pages = ?,
                             sources = ?, source_ids = ?, status = ?, last_updated = ?,
                             citation_count = ?, relevance_score = ?, quality_score = ?,
-                            pdf_path = ?, full_text = ?, metadata = ?
+                            pdf_path = ?, full_text = ?, metadata = ?,
+                            exclusion_reason = ?, exclusion_notes = ?
                         WHERE id = ?
                     """, (
                         paper.title, paper.abstract, paper.doi, paper.url, paper.pdf_url,
@@ -196,6 +206,8 @@ class DatabaseManager:
                         json_fields['sources'], json_fields['source_ids'], paper.status.value, paper.last_updated.isoformat(),
                         paper.citation_count, paper.relevance_score, paper.quality_score,
                         paper.pdf_path, paper.full_text, json_fields['metadata'],
+                        paper.exclusion_reason.value if paper.exclusion_reason else None,
+                        paper.exclusion_notes,
                         paper.id
                     ))
                 else:
@@ -205,8 +217,9 @@ class DatabaseManager:
                             year, journal, conference, volume, issue, pages,
                             sources, source_ids, status, discovered_at, last_updated,
                             citation_count, relevance_score, quality_score,
-                            pdf_path, full_text, metadata
-                        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                            pdf_path, full_text, metadata,
+                            exclusion_reason, exclusion_notes
+                        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                     """, (
                         paper.id, paper.title, json_fields['authors'], paper.abstract, paper.doi,
                         paper.url, paper.pdf_url, paper.year, paper.journal, paper.conference,
@@ -214,7 +227,9 @@ class DatabaseManager:
                         json_fields['sources'], json_fields['source_ids'], paper.status.value,
                         paper.discovered_at.isoformat(), paper.last_updated.isoformat(),
                         paper.citation_count, paper.relevance_score, paper.quality_score,
-                        paper.pdf_path, paper.full_text, json_fields['metadata']
+                        paper.pdf_path, paper.full_text, json_fields['metadata'],
+                        paper.exclusion_reason.value if paper.exclusion_reason else None,
+                        paper.exclusion_notes
                     ))
                 
                 self.logger.debug(f"Paper saved: {paper.id}")
@@ -239,14 +254,36 @@ class DatabaseManager:
             self.logger.error(f"Error retrieving paper: {str(e)}")
             return None
     
-    def get_papers_by_status(self, status: PaperStatus, limit: int = 100) -> List[Paper]:
-        """Get papers by status."""
+    def get_paper_by_doi(self, doi: str) -> Optional[Paper]:
+        """Retrieve a paper by DOI."""
         try:
+            with self.get_connection() as conn:
+                cursor = conn.cursor()
+                cursor.execute("SELECT * FROM papers WHERE doi = ?", (doi,))
+                row = cursor.fetchone()
+                
+                if not row:
+                    return None
+                
+                return self._row_to_paper(row)
+        except Exception as e:
+            self.logger.error(f"Error retrieving paper by DOI: {str(e)}")
+            return None
+    
+    def get_papers_by_status(self, status, limit: int = 100) -> List[Paper]:
+        """Get papers by status (accepts PaperStatus enum or string)."""
+        try:
+            # Handle both enum and string
+            if isinstance(status, PaperStatus):
+                status_value = status.value
+            else:
+                status_value = status
+            
             with self.get_connection() as conn:
                 cursor = conn.cursor()
                 cursor.execute(
                     "SELECT * FROM papers WHERE status = ? ORDER BY last_updated DESC LIMIT ?",
-                    (status.value, limit)
+                    (status_value, limit)
                 )
                 return [self._row_to_paper(row) for row in cursor.fetchall()]
         except Exception as e:
@@ -267,13 +304,18 @@ class DatabaseManager:
             self.logger.error(f"Error retrieving all papers: {str(e)}")
             return []
     
-    def count_papers(self, status: Optional[PaperStatus] = None) -> int:
-        """Count papers, optionally by status."""
+    def count_papers(self, status=None) -> int:
+        """Count papers, optionally by status (accepts PaperStatus enum or string)."""
         try:
             with self.get_connection() as conn:
                 cursor = conn.cursor()
                 if status:
-                    cursor.execute("SELECT COUNT(*) FROM papers WHERE status = ?", (status.value,))
+                    # Handle both enum and string
+                    if isinstance(status, PaperStatus):
+                        status_value = status.value
+                    else:
+                        status_value = status
+                    cursor.execute("SELECT COUNT(*) FROM papers WHERE status = ?", (status_value,))
                 else:
                     cursor.execute("SELECT COUNT(*) FROM papers")
                 return cursor.fetchone()[0]
@@ -283,6 +325,18 @@ class DatabaseManager:
     
     def _row_to_paper(self, row) -> Paper:
         """Convert database row to Paper object."""
+        from .models import ExclusionReason
+        
+        # Handle exclusion_reason (may be NULL in old records)
+        exclusion_reason = None
+        if 'exclusion_reason' in row.keys() and row['exclusion_reason']:
+            exclusion_reason = ExclusionReason(row['exclusion_reason'])
+        
+        # Handle exclusion_notes (may not exist in old schema)
+        exclusion_notes = None
+        if 'exclusion_notes' in row.keys():
+            exclusion_notes = row['exclusion_notes']
+        
         return Paper(
             id=row['id'],
             title=row['title'],
@@ -307,7 +361,9 @@ class DatabaseManager:
             quality_score=row['quality_score'],
             pdf_path=row['pdf_path'],
             full_text=row['full_text'],
-            metadata=json.loads(row['metadata'])
+            metadata=json.loads(row['metadata']),
+            exclusion_reason=exclusion_reason,
+            exclusion_notes=exclusion_notes
         )
     
     # === Summary Operations ===

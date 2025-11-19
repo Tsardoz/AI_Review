@@ -31,16 +31,46 @@ class PaperSource(str, Enum):
     MANUAL = "manual"
 
 
+class ExclusionReason(str, Enum):
+    """PRISMA-compliant exclusion reasons."""
+    # Abstract screening exclusions
+    IRRELEVANT_TOPIC = "irrelevant_topic"
+    WRONG_POPULATION = "wrong_population"
+    WRONG_INTERVENTION = "wrong_intervention"
+    WRONG_STUDY_TYPE = "wrong_study_type"
+    NOT_PEER_REVIEWED = "not_peer_reviewed"
+    WRONG_LANGUAGE = "wrong_language"
+    DUPLICATE = "duplicate"
+    
+    # Full-text exclusions
+    INSUFFICIENT_DATA = "insufficient_data"
+    POOR_METHODOLOGY = "poor_methodology"
+    CANNOT_ACCESS_FULLTEXT = "cannot_access_fulltext"
+    RETRACTED = "retracted"
+    
+    # Other
+    OTHER = "other"
+
+
 class PaperStatus(str, Enum):
-    """Status of paper processing."""
-    DISCOVERED = "discovered"           # Found in search
-    FILTERED = "filtered"                # Passed quality filters
-    ACQUIRED = "acquired"                # PDF obtained
-    PROCESSED = "processed"              # Text extracted
-    SUMMARIZED = "summarized"            # Summary generated
+    """Status of paper processing (PRISMA-compliant workflow)."""
+    # Phase 1: Identification & Screening (Abstract-based)
+    DISCOVERED = "discovered"           # Found in search (raw API results)
+    SCREENED_IN = "screened_in"         # Passed abstract-based relevance filter
+    SCREENED_OUT = "screened_out"       # Rejected during abstract screening
+    
+    # Phase 2: Acquisition (Human-assisted)
+    AWAITING_PDF = "awaiting_pdf"       # Selected for full-text review, needs manual download
+    PDF_ACQUIRED = "pdf_acquired"       # PDF obtained and matched to database
+    
+    # Phase 3: Synthesis (Full-text analysis)
+    TEXT_EXTRACTED = "text_extracted"   # Full text extracted from PDF
+    SYNTHESIZED = "synthesized"         # Full-text analysis and summary completed
+    
+    # Quality Control
     VALIDATED = "validated"              # Quality check passed
+    REJECTED = "rejected"                # Failed quality check at any stage
     ARCHIVED = "archived"                # Final storage
-    REJECTED = "rejected"                # Failed quality check
 
 
 class Paper(BaseModel):
@@ -71,6 +101,10 @@ class Paper(BaseModel):
     status: PaperStatus = Field(default=PaperStatus.DISCOVERED)
     discovered_at: datetime = Field(default_factory=lambda: datetime.now(UTC))
     last_updated: datetime = Field(default_factory=lambda: datetime.now(UTC))
+    
+    # PRISMA Exclusion Tracking
+    exclusion_reason: Optional[ExclusionReason] = Field(None, description="Reason for exclusion (if SCREENED_OUT or REJECTED)")
+    exclusion_notes: Optional[str] = Field(None, description="Additional details about exclusion")
     
     # Quality metrics
     citation_count: int = Field(default=0, ge=0)
